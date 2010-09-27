@@ -10,12 +10,10 @@ class View extends \lithium\core\Object {
     static protected $_tmplDir;
 
     public function render ($type, $data = null, array $options = array()) {
-        $request = $options['request'];
-        $tmplFile = implode('/', array($options['controller'], $options['template']));
-        $tmplFile .= '.' . $options['type'];
-        $tmplDirs = $this->getTemplateRepository($request);
-
+        $tmplFile = $options['controller'] . '/' . $options['template'] . '.' . $options['type'];
+        $tmplDirs = $this->getTemplateRepository($options['request']);
         $tmpl = PHPTAL::create()
+            ->setPhpCodeDestination($this->getTempDir())
             ->setTemplateRepository($tmplDirs)
             ->setOutputMode(PHPTAL::HTML5)
             ->setTemplate($tmplFile);
@@ -32,6 +30,14 @@ class View extends \lithium\core\Object {
             }
         }
         return $dirs;
+    }
+
+    public function getTempDir () {
+        $dir = LITHIUM_APP_PATH . '/resources/tmpl/';
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
+        return $dir;
     }
 
 }
